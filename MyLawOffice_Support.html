@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Law Office Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ——— THEME ——— */
+    :root {
+      --bg: #0f172a;
+      --bg-alt: #020617;
+      --card: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #1f2937;
+      --danger: #f97373;
+      --success: #4ade80;
+      --warning: #facc15;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    .shell {
+      width: 100%;
+      max-width: 1240px;
+      background: linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.98));
+      border-radius: 28px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      box-shadow: var(--shadow-soft);
+      padding: 24px 26px 26px;
+      backdrop-filter: blur(18px);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+      padding-bottom: 16px;
+    }
+
+    .brand-block { display: flex; flex-direction: column; gap: 6px; }
+    .brand-title { font-size: 1.4rem; font-weight: 650; letter-spacing: 0.03em; display: flex; gap: 10px; }
+    .brand-pill {
+      font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--muted); padding: 4px 10px; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), transparent 55%);
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .brand-pill-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); }
+    .brand-subtitle { font-size: 0.86rem; color: var(--muted); }
+
+    .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .status-row { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .status-pill {
+      font-size: 0.72rem; padding: 4px 10px; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .dot { width: 7px; height: 7px; border-radius: 999px; }
+    .dot-live { background: var(--success); }
+    .dot-deadline { background: var(--warning); }
+    .dot-risk { background: var(--danger); }
+    .date-text { font-size: 0.78rem; color: var(--muted); }
+
+    /* ——— GRID ——— */
+    main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+    }
+    @media (max-width: 960px) { main { grid-template-columns: 1fr; } }
+
+    /* ——— PANELS ——— */
+    .panel {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%),
+                  radial-gradient(circle at bottom right, rgba(15, 23, 42, 0.9), #020617);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 14px 14px 16px;
+      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.85);
+    }
+
+    .panel-header { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .panel-title { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--muted); display: flex; gap: 8px; }
+    .panel-title-dot { width: 7px; height: 7px; border-radius: 999px; background: var(--accent); }
+    .panel-subtitle { font-size: 0.78rem; color: var(--muted); }
+
+    /* ——— LINK GRID ——— */
+    .link-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .link-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 10px 11px;
+      display: flex; flex-direction: column; gap: 4px;
+      text-decoration: none; color: var(--text);
+      position: relative; overflow: hidden;
+    }
+    .link-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+
+    .link-label { font-size: 0.86rem; font-weight: 550; display: flex; justify-content: space-between; }
+    .link-tag {
+      font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.14em;
+      color: var(--muted); padding: 2px 7px; border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+    .link-desc { font-size: 0.78rem; color: var(--muted); }
+    .pill-soft {
+      padding: 2px 7px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      font-size: 0.7rem; text-transform: uppercase;
+    }
+
+    /* ——— MINI CARDS ——— */
+    .mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+    .mini-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: var(--radius-md);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 8px 9px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .mini-label { font-size: 0.8rem; color: var(--text); font-weight: 500; }
+
+    .list { margin: 6px 0 0; padding-left: 16px; font-size: 0.78rem; color: var(--muted); }
+    .badge-row { display: flex; flex-wrap: wrap; gap: 6px; }
+    .badge { font-size: 0.68rem; padding: 2px 7px; border-radius: 999px; border: 1px solid rgba(148, 163, 184, 0.4); }
+    .badge.alert { border-color: rgba(248, 113, 113, 0.7); color: #fecaca; background: rgba(127, 29, 29, 0.35); }
+    .badge.ok { border-color: rgba(74, 222, 128, 0.7); color: #bbf7d0; background: rgba(22, 101, 52, 0.35); }
+    .badge.info { border-color: rgba(56, 189, 248, 0.7); color: #bae6fd; background: rgba(12, 74, 110, 0.35); }
+
+    .section-note { font-size: 0.76rem; color: var(--muted); margin-top: 4px; }
+  </style>
+</head>
+
+<body>
+  <div class="shell">
+
+    <!-- ——— HEADER ——— -->
+    <header>
+      <div class="brand-block">
+        <div class="brand-title">
+          Law Office Dashboard
+          <span class="brand-pill"><span class="brand-pill-dot"></span>Unified practice workspace</span>
+        </div>
+        <div class="brand-subtitle">Daily launchpad for filings, intake, culture, and bilingual reference.</div>
+      </div>
+
+      <div class="header-right">
+        <div class="status-row">
+          <div class="status-pill"><span class="dot dot-live"></span>Live e‑filing access</div>
+          <div class="status-pill"><span class="dot dot-deadline"></span>Deadlines & disaster relief</div>
+          <div class="status-pill"><span class="dot dot-risk"></span>Tarrant County focus</div>
+        </div>
+        <div class="date-text">Today’s focus: filings, client intake, and Spanish terminology fluency.</div>
+      </div>
+    </header>
+
+    <!-- ——— MAIN GRID ——— -->
+    <main>
+
+      <!-- LEFT COLUMN -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-title-dot"></span>Core Practice Portals</div>
+            <div class="panel-subtitle">Filing, firm site, culture hub, and local legal aid.</div>
+          </div>
+        </div>
+
+        <div class="link-grid">
+          <a class="link-card" href="https://www.efiletexas.gov/" target="_blank">
+            <div class="link-label"><span>eFileTexas</span><span class="link-tag">E‑filing</span></div>
+            <div class="link-desc">Statewide electronic filing portal for Texas courts.</div>
+            <div class="pill-soft">Priority: High</div>
+          </a>
+
+          <a class="link-card" href="https://gillbrissette.com/" target="_blank">
+            <div class="link-label"><span>Gill Brissette</span><span class="link-tag">Firm site</span></div>
+            <div class="link-desc">Public‑facing firm information and services.</div>
+          </a>
+
+          <a class="link-card" href="https://culturecare.online/" target="_blank">
+            <div class="link-label"><span>CultureCare.Online</span><span class="link-tag">Studio / Ops</span></div>
+            <div class="link-desc">Culture, systems, and documentation ecosystem.</div>
+          </a>
+
+          <a class="link-card" href="https://www.legalaidoffices.com/county/tx-tarrant#google_vignette" target="_blank">
+            <div class="link-label"><span>Tarrant County Legal Aid</span><span class="link-tag">Referrals</span></div>
+            <div class="link-desc">Local legal aid offices for referrals and collaboration.</div>
+          </a>
+        </div>
+
+        <p class="section-note">Workflow powered by Google Workspace, MS Office and Github-AWS.</p>
+      </section>
+
+      <!-- RIGHT COLUMN -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-title-dot"></span>Reference & Research</div>
+            <div class="panel-subtitle">Bilingual terminology, disaster tax questions, and AI workspaces.</div>
+          </div>
+        </div>
+
+        <div class="mini-grid">
+
+          <div class="mini-card">
+            <div class="mini-label">Spanish Legal Terminology Glossary</div>
+            <div></div>
+            <div class="badge-row"><span class="badge info">Bilingual</span></div>
+          </div>
+
+          <div class="mini-card">
+            <div class="mini-label">Disaster & Casualty Loss Tax Research</div>
+            <ul class="list">
+              <li>Confirm disaster declaration dates</li>
+              <li>Check IRS guidance on extensions</li>
+              <li>Document advice in client memos</li>
+            </ul>
+            <div class="badge-row"><span class="badge alert">Time‑sensitive</span></div>
+          </div>
+
+          <div class="mini-card">
+            <div class="mini-label">AI Workspaces</div>
+            <ul class="list">
+              <li>Summaries (non‑confidential)</li>
+              <li>Template letters</li>
+              <li>Workflow drafting</li>
+            </ul>
+            <div class="badge-row"><span class="badge ok">Internal only</span></div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ——— SECOND ROW: CHECKLIST + INTAKE + CALENDAR ——— -->
+    <main style="margin-top:20px; grid-template-columns: 1fr 1fr 1fr;">
+
+      <!-- DAILY CHECKLIST -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-title-dot"></span>Daily Checklist</div>
+            <div class="panel-subtitle">Tasks reset every morning</div>
+          </div>
+        </div>
+
+        <ul id="dailyChecklist" class="list" style="list-style:none; padding-left:0;">
+          <li><label><input type="checkbox"> Review new filings</label></li>
+          <li><label><input type="checkbox"> Check deadlines & reminders</label></li>
+          <li><label><input type="checkbox"> Respond to priority emails</label></li>
+          <li><label><input type="checkbox"> Update case notes</label></li>
+          <li><label><input type="checkbox"> Intake follow‑ups</label></li>
+        </ul>
+
+        <p class="section-note">Progress saves automatically.</p>
+      </section>
+<div class="mini-card" style="grid-column: 1 / -1; height:auto;">
+  <div class="mini-label">Notes</div>
+  <textarea style="width:100%; height:120px; padding:6px; border-radius:6px; resize:vertical;"></textarea>
+</div>
+
+
+      <!-- INTAKE TRIAGE -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title"><span class="panel-title-dot"></span>Quick Intake Triage</div>
+            <div class="panel-subtitle">Fast assessment for new clients</div>
+          </div>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card">
+            <div class="mini-label">Client Type</div>
+            <select style="width:100%; padding:6px; border-radius:6px;">
+              <option>Individual</option><option>Business</option><option>Nonprofit</option>
+            </select>
+          </div>
+
+          <div class="mini-card">
+            <div class="mini-label">Matter Category</div>
+            <select style="width:100%; padding:6px; border-radius:6px;">
+              <option>Civil</option><option>Family</option><option>Criminal</option>
+              <option>Probate</option><option>Immigration</option><option>Tax / Casualty Loss</option>
+            </select>
+          </div>
+
+          <div class="mini-card">
+            <div class="mini-label">Urgency</div>
+            <select style="width:100%; padding:6px; border-radius:6px;">
+              <option>Routine</option><option>Time‑Sensitive</option><option>Emergency</option>
+            </select>
+          </div>
+
+          <div class="mini-card">
+            <div class="mini-label">Conflict Check</div>
+            <input type="text" placeholder="Names to check…" style="width:100%; padding:6px; border-radius:6px;">
+          </div>
+
+          <div class="mini-card" style="grid-column: 1 / -1; height:auto;">
+  <div class="mini-label">Notes</div>
+  <textarea style="width:100%; height:120px; padding:6px; border-radius:6px; resize:vertical;"></textarea>
+</div>
+</section>
+<section style="max-width:700px;margin:5rem auto;">
+  <div style="
+    background:#f4efe8;
+    border-radius:20px;
+    padding:2rem;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+    border:1px solid rgba(0,46,69,.15);
+    font-family:serif;
+  ">
+
+    <h3 style="color:#002E45;margin-bottom:1rem;">
+Power of Communication — Leave a Message
+    </h3>
+
+    <p style="color:#002E45;opacity:.85;margin-bottom:2rem;">
+      Message goes directly to staff with quick response time.
+    </p>
+
+    <form action="https://formspree.io/f/mreebqqj" method="POST">
+      
+      <label style="display:block;margin-bottom:.5rem;color:#002E45;">
+        Your name (optional)
+      </label>
+      <input 
+        type="text" 
+        name="name"
+        style="width:100%;padding:.75rem;border-radius:10px;border:1px solid #ccc;margin-bottom:1.5rem;"
+      />
+
+      <label style="display:block;margin-bottom:.5rem;color:#002E45;">
+        Your message
+      </label>
+      <textarea 
+        name="message" 
+        rows="5"
+        placeholder="What would you like to discuss?"
+        style="width:100%;padding:.75rem;border-radius:10px;border:1px solid #ccc;margin-bottom:1.5rem;"
+        required
+      ></textarea>
+
+      <!-- Optional metadata -->
+      <input type="hidden" name="source" value="Client Inquiry Chatbox" />
+
+      <button 
+        type="submit"
+        style="
+          background:#058397;
+          color:white;
+          border:none;
+          padding:.75rem 1.5rem;
+          border-radius:999px;
+          font-size:1rem;
+          cursor:pointer;
+        "
+      >
+        Send
+      </button>
+
+    </form>
+
+    <p style="margin-top:1.5rem;font-size:.85rem;color:#002E45;opacity:.7;">
+      Billing. Client Services. Data Management.
+    </p>
+
+  </div>
+</section>
+
